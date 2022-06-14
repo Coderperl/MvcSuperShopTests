@@ -13,7 +13,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using MvcSuperShop.Controllers;
 using MvcSuperShop.Data;
+using MvcSuperShop.Infrastructure.Context;
 using MvcSuperShop.Services;
+using MvcSuperShop.ViewModels;
 
 namespace MvcSuperShopTests.Controllers
 {
@@ -85,6 +87,94 @@ namespace MvcSuperShopTests.Controllers
             var viewName = result.ViewName;
 
             Assert.IsTrue(string.IsNullOrEmpty(viewName)|| viewName == "Index");
+        }
+        [TestMethod]
+        public void Index_should_return_5_trendingCategories()
+        {
+            //arrange
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Email, "CoderPerl@github.com")
+            }, "TestAuthentication"));
+
+            _sut.ControllerContext = new ControllerContext();
+            _sut.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = user
+            };
+
+            _categoryServiceMock.Setup(e => e.GetTrendingCategories(3))
+                .Returns(new List<Category>
+                {
+                new Category(),
+                new Category(),
+                new Category(),
+                new Category(),
+                new Category()
+                });
+
+            _mapperMock.Setup(m => m.Map<List<CategoryViewModel>>(It.IsAny<List<Category>>())).Returns(
+                new List<CategoryViewModel>
+                {
+                new CategoryViewModel(),
+                new CategoryViewModel(),
+                new CategoryViewModel(),
+                new CategoryViewModel(),
+                new CategoryViewModel(),
+                });
+
+            //act
+            var result = _sut.Index() as ViewResult;
+            var model = result.Model as HomeIndexViewModel;
+
+            //assert
+            Assert.AreEqual(5, model.TrendingCategories.Count);
+        }
+        [TestMethod]
+        public void Index_should_show_5_products()
+        {
+            //arrange
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+            new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Email, "CoderPerl@github.com")
+            }, "TestAuthentication"));
+
+            _sut.ControllerContext = new ControllerContext();
+            _sut.ControllerContext.HttpContext = new DefaultHttpContext
+            {
+                User = user
+            };
+
+            _productServiceMock.Setup(e => e.GetNewProducts(5, new CurrentCustomerContext()))
+                .Returns(new List<ProductServiceModel>
+                {
+                new ProductServiceModel(),
+                new ProductServiceModel(),
+                new ProductServiceModel(),
+                new ProductServiceModel(),
+                new ProductServiceModel(),
+                
+                });
+
+
+            _mapperMock.Setup(m => m.Map<IEnumerable<ProductBoxViewModel>>(It.IsAny<IEnumerable<ProductServiceModel>>())).Returns(
+                new List<ProductBoxViewModel>
+                {
+                new ProductBoxViewModel(),
+                new ProductBoxViewModel(),
+                new ProductBoxViewModel(),
+                new ProductBoxViewModel(),
+                new ProductBoxViewModel(),
+                });
+
+            //act
+            var result = _sut.Index() as ViewResult;
+            var model = result.Model as HomeIndexViewModel;
+
+            //assert
+            Assert.AreEqual(5, model.NewProducts.Count);
         }
     }
 }
