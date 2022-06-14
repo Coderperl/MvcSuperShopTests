@@ -86,7 +86,7 @@ namespace MvcSuperShopTests.Services
                 {
                     new Agreement
                     {
-                        //Name = "korv",
+                        
                         AgreementRows = new List<AgreementRow>()
                         {
                             new AgreementRow()

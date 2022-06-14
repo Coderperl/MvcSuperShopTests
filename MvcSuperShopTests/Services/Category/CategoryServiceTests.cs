@@ -28,7 +28,7 @@ namespace MvcSuperShopTests.Services
         [TestMethod]
         public void TrendingCategory_returns_asked_for_amount_of_Categories()
         {
-
+            //Arrange
             var category1 = new Category() {Id = 1, Name = "Van", Icon = "Cool"};
             var category2 = new Category() { Id = 2, Name = "Hybrid", Icon = "Cool" };
             var category3= new Category() { Id = 3, Name = "Combi", Icon = "Cool" };
@@ -43,9 +43,9 @@ namespace MvcSuperShopTests.Services
             _context.Categories.Add(category5);
             _context.Categories.Add(category6);
             _context.SaveChanges();
-
+            //Act
             var result = _sut.GetTrendingCategories(4);
-
+            //Assert
             Assert.AreEqual(4, result.Count());
         }
     }

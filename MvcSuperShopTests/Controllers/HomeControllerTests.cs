@@ -85,13 +85,13 @@ namespace MvcSuperShopTests.Controllers
             //Act
             var result = _sut.Index() as ViewResult;
             var viewName = result.ViewName;
-
+            //Assert
             Assert.IsTrue(string.IsNullOrEmpty(viewName)|| viewName == "Index");
         }
         [TestMethod]
         public void Index_should_return_5_trendingCategories()
         {
-            //arrange
+            //Arrange
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
             new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
@@ -124,17 +124,17 @@ namespace MvcSuperShopTests.Controllers
                 new CategoryViewModel(),
                 });
 
-            //act
+            //Act
             var result = _sut.Index() as ViewResult;
             var model = result.Model as HomeIndexViewModel;
 
-            //assert
+            //Assert
             Assert.AreEqual(5, model.TrendingCategories.Count);
         }
         [TestMethod]
         public void Index_should_show_5_products()
         {
-            //arrange
+            //Arrange
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
             new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
@@ -169,11 +169,11 @@ namespace MvcSuperShopTests.Controllers
                 new ProductBoxViewModel(),
                 });
 
-            //act
+            //Act
             var result = _sut.Index() as ViewResult;
             var model = result.Model as HomeIndexViewModel;
 
-            //assert
+            //Assert
             Assert.AreEqual(5, model.NewProducts.Count);
         }
     }
