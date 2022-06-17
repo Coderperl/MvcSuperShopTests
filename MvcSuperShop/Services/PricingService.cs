@@ -1,37 +1,36 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using MvcSuperShop.Data;
+﻿using MvcSuperShop.Data;
 using MvcSuperShop.Infrastructure.Context;
 
 namespace MvcSuperShop.Services;
 
 public class PricingService : IPricingService
 {
-    
-    public IEnumerable<ProductServiceModel> CalculatePrices(IEnumerable<ProductServiceModel> products, CurrentCustomerContext customerContext)
+    public IEnumerable<ProductServiceModel> CalculatePrices(IEnumerable<ProductServiceModel> products,
+        CurrentCustomerContext customerContext)
     {
         foreach (var product in products)
         {
-            var lowest = product.BasePrice;
+            var lowestPriceSoFar = product.BasePrice;
             if (customerContext != null)
-            {
                 foreach (var agreement in customerContext.Agreements)
+                foreach (var agreementRow in agreement.AgreementRows)
                 {
-                    foreach (var agreementRow in agreement.AgreementRows)
+                    if (!AgreementMatches(agreementRow, product)) continue;
                     {
-                        if (AgreementMatches(agreementRow, product))
-                        {
-                            var price = (1.0m - (agreementRow.PercentageDiscount / 100.0m)) * product.BasePrice;
-                            if (price < lowest)
-                                lowest = Convert.ToInt32(Math.Round(price, 0));
-                        }
-
+                        var discountPrice = CalculateDiscountPrices(product.BasePrice,
+                            agreementRow.PercentageDiscount);
+                        if (discountPrice < lowestPriceSoFar)
+                            lowestPriceSoFar = Convert.ToInt32(Math.Round(discountPrice, 0));
                     }
                 }
-            }
-            product.Price = lowest;
+            product.Price = lowestPriceSoFar;
             yield return product;
         }
+    }
+
+    private decimal CalculateDiscountPrices(int productBasePrice, decimal percentageDiscount)
+    {
+        return (1.0m - percentageDiscount / 100.0m) * productBasePrice;
     }
 
     private bool AgreementMatches(AgreementRow agreementRow, ProductServiceModel product)
@@ -47,6 +46,5 @@ public class PricingService : IPricingService
             return false;
 
         return true;
-
     }
 }

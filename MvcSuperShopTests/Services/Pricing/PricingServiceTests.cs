@@ -143,7 +143,7 @@ namespace MvcSuperShopTests.Services
             var productList = new List<ProductServiceModel>()
             {
                 new ProductServiceModel{BasePrice = 100000, ManufacturerName = "Toyota", CategoryName = "Van", Name = "Rav-4"}
-            };
+            }; 
 
             var customerContext = new CurrentCustomerContext()
             {
@@ -170,6 +170,48 @@ namespace MvcSuperShopTests.Services
             //Assert
             Assert.AreEqual(90000.0m, products.First().Price);
         }
+
+        [TestMethod]
+        public void When_two_agreements_with_different_PercentageDiscount_returns_the_lowest()
+        {
+            //Arrange
+            var productList = new List<ProductServiceModel>
+            {
+                new ProductServiceModel{BasePrice = 100000, Name = "Hybrid", CategoryName = "Toyota"}
+            };
+
+            var customerContext = new CurrentCustomerContext
+            {
+                Agreements = new List<Agreement>
+                {
+                    new Agreement
+                    {
+                        AgreementRows = new List<AgreementRow>
+                        {
+                            new AgreementRow
+                            {
+                                PercentageDiscount = 10.0m,
+                                ProductMatch = "Hybrid"
+                            },
+                            new AgreementRow
+                            {
+                                PercentageDiscount = 5.0m,
+                                CategoryMatch = "Toyota"
+                            }
+                        }
+                    }
+                }
+            };
+
+
+            //act
+            var products = _sut.CalculatePrices(productList, customerContext);
+
+
+            //Assert
+            Assert.AreEqual(90000, products.First().Price);
+        }
+
     }
-    
+
 }

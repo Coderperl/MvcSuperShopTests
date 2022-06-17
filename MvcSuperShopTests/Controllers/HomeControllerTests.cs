@@ -62,7 +62,7 @@ namespace MvcSuperShopTests.Controllers
                 User = user
             };
 
-            var ua = new UserAgreements()
+            var agreements = new UserAgreements()
             {
                 Email = "CoderPerl@github.com",
                 Agreement = new Agreement()
@@ -80,7 +80,7 @@ namespace MvcSuperShopTests.Controllers
                     }
                 }
             };
-            _context.UserAgreements.Add(ua);
+            _context.UserAgreements.Add(agreements);
             _context.SaveChanges();
             //Act
             var result = _sut.Index() as ViewResult;
